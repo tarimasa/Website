@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -23,6 +24,11 @@ export const metadata: Metadata = {
   },
 };
 
+// AdSense パブリッシャーID（AdSense 審査通過後に設定）
+// 設定方法: GitHub リポジトリの Settings > Secrets > NEXT_PUBLIC_ADSENSE_CLIENT_ID
+// 値の例: ca-pub-XXXXXXXXXXXXXXXX
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,12 +40,16 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
-        {/* Google AdSense（申請後にコメントアウトを解除） */}
-        {/* <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
-          crossOrigin="anonymous"
-        /> */}
+
+        {/* Google AdSense: NEXT_PUBLIC_ADSENSE_CLIENT_ID が設定されている場合のみ読み込む */}
+        {ADSENSE_CLIENT_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

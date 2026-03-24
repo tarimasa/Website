@@ -22,6 +22,12 @@ export default function Footer() {
           >
             X (Twitter)
           </a>
+          <a
+            href="/privacy"
+            className="hover:text-slate-900 transition-colors"
+          >
+            プライバシーポリシー
+          </a>
         </div>
       </div>
     </footer>
