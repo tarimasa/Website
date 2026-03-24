@@ -13,6 +13,12 @@
 
 import { BlobServiceClient } from "@azure/storage-blob";
 import { ClientSecretCredential } from "@azure/identity";
+
+// GitHub Actions で別ステップ実行済みの場合はスキップ
+if (process.env.SKIP_BLOB_DOWNLOAD === "true") {
+  console.log("[download-blob-images] SKIP_BLOB_DOWNLOAD=true のためスキップします");
+  process.exit(0);
+}
 import { createWriteStream, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
