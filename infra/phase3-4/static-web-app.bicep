@@ -1,4 +1,4 @@
-@description('Azure Static Web Apps リソース定義')
+@description('Azure Static Web Apps リソース定義（Freeプラン）')
 param location string = 'eastasia'
 
 @description('Static Web Apps のリソース名')
@@ -15,18 +15,16 @@ param branch string = 'main'
 param repositoryToken string
 
 // -------------------------------------------------------
-// Azure Static Web Apps（Standard プラン）
-// ※ Managed Identity は Standard プラン以上で使用可能
+// Azure Static Web Apps（Free プラン）
+// Free プランは Managed Identity 非対応
+// 代わりに Entra ID App Registration を使用（setup-app-registration.sh で設定）
 // -------------------------------------------------------
 resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
   name: appName
   location: location
   sku: {
-    name: 'Standard'
-    tier: 'Standard'
-  }
-  identity: {
-    type: 'SystemAssigned'  // Managed Identity を有効化
+    name: 'Free'
+    tier: 'Free'
   }
   properties: {
     repositoryUrl: repositoryUrl
@@ -35,7 +33,7 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
     buildProperties: {
       appLocation: '/'
       outputLocation: 'out'
-      skipGithubActionWorkflowGeneration: false
+      skipGithubActionWorkflowGeneration: true  // 手動管理の workflow を使用
     }
     stagingEnvironmentPolicy: 'Enabled'
     allowConfigFileUpdates: true
@@ -43,18 +41,8 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
 }
 
 // -------------------------------------------------------
-// カスタムドメイン設定（オプション）
-// -------------------------------------------------------
-// resource customDomain 'Microsoft.Web/staticSites/customDomains@2022-09-01' = {
-//   parent: staticWebApp
-//   name: 'your-domain.com'
-//   properties: {}
-// }
-
-// -------------------------------------------------------
 // Outputs
 // -------------------------------------------------------
 output staticWebAppId string = staticWebApp.id
 output defaultHostname string = staticWebApp.properties.defaultHostname
-output managedIdentityPrincipalId string = staticWebApp.identity.principalId
 output deploymentToken string = listSecrets(staticWebApp.id, staticWebApp.apiVersion).properties.apiKey

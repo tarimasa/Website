@@ -1,4 +1,4 @@
-@description('Azure Blob Storage for website images')
+@description('Azure Blob Storage for website images (private container)')
 param location string = 'japaneast'
 
 @description('Storage account name (globally unique, 3-24 chars, lowercase alphanumeric)')
@@ -7,11 +7,8 @@ param storageAccountName string = 'websiteblob${uniqueString(resourceGroup().id)
 @description('Container name for storing blog images')
 param containerName string = 'images'
 
-@description('Allow public read access to images container')
-param enablePublicAccess bool = true
-
 // -------------------------------------------------------
-// Storage Account
+// Storage Account（パブリックアクセス無効・プライベート構成）
 // -------------------------------------------------------
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
@@ -21,13 +18,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
   kind: 'StorageV2'
   properties: {
-    allowBlobPublicAccess: enablePublicAccess
+    allowBlobPublicAccess: false        // パブリックアクセス完全無効
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     accessTier: 'Hot'
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Enabled'      // Entra ID 認証経由でアクセス可
     networkAcls: {
-      defaultAction: 'Allow'  // 後でPhase4でAzureServicesのみに制限
+      defaultAction: 'Allow'
       bypass: 'AzureServices'
     }
   }
@@ -45,29 +42,22 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01'
       days: 7
     }
     cors: {
-      corsRules: [
-        {
-          allowedHeaders: ['*']
-          allowedMethods: ['GET', 'HEAD']
-          allowedOrigins: ['*']
-          exposedHeaders: ['*']
-          maxAgeInSeconds: 3600
-        }
-      ]
+      corsRules: []  // プライベートのため CORS 不要
     }
   }
 }
 
 // -------------------------------------------------------
-// Images コンテナ（ブログ画像用）
+// images コンテナ（プライベート・App Registration 経由でのみアクセス可）
 // -------------------------------------------------------
 resource imagesContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
   parent: blobService
   name: containerName
   properties: {
-    publicAccess: enablePublicAccess ? 'Blob' : 'None'
+    publicAccess: 'None'   // 匿名アクセス無効
     metadata: {
       purpose: 'blog-images'
+      accessControl: 'entra-id-app-registration'
     }
   }
 }
@@ -77,6 +67,5 @@ resource imagesContainer 'Microsoft.Storage/storageAccounts/blobServices/contain
 // -------------------------------------------------------
 output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
-output storageAccountPrimaryEndpoint string = storageAccount.properties.primaryEndpoints.blob
+output storageAccountBlobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 output containerName string = containerName
-output imagesBaseUrl string = '${storageAccount.properties.primaryEndpoints.blob}${containerName}'

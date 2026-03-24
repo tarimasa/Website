@@ -1,17 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",  // Azure Static Web Apps 用に静的エクスポート
+  output: "export",
   trailingSlash: true,
+  // prebuild スクリプトが SKIP_PREBUILD=true の場合はスキップ
+  // （GitHub Actions では download-blob-images.mjs を別ステップで実行するため）
   images: {
-    unoptimized: true,  // 静的エクスポート時は画像最適化を無効化
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.blob.core.windows.net",  // Azure Blob Storage
-        pathname: "/images/**",
-      },
-    ],
+    unoptimized: true,
+    // ローカル開発用: public/blog-images/ からも提供
+    remotePatterns: [],
   },
 };
 

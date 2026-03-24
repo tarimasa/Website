@@ -1,4 +1,4 @@
-@description('Azure Static Web Apps + RBAC 設定のメインテンプレート')
+@description('ポートフォリオサイト Azure Static Web Apps デプロイ（Freeプラン）')
 param location string = 'eastasia'
 
 @description('Static Web Apps のリソース名')
@@ -14,14 +14,9 @@ param branch string = 'main'
 @secure()
 param repositoryToken string
 
-@description('Blob Storage アカウント名（Phase 1 で作成済み）')
-param blobStorageAccountName string
-
-@description('Blob Storage リソースグループ（Phase 1 と同じ場合は同じ値）')
-param blobStorageResourceGroup string = resourceGroup().name
-
 // -------------------------------------------------------
-// モジュール: Static Web Apps
+// モジュール: Static Web Apps（Free プラン）
+// RBAC 設定は setup-app-registration.sh（Graph API + ARM API）で実施済み
 // -------------------------------------------------------
 module staticWebApp 'static-web-app.bicep' = {
   name: 'staticWebAppDeploy'
@@ -35,32 +30,8 @@ module staticWebApp 'static-web-app.bicep' = {
 }
 
 // -------------------------------------------------------
-// Blob Storage への RBAC 割り当て
-// Storage Blob Data Reader ロール
-// -------------------------------------------------------
-resource blobStorage 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
-  name: blobStorageAccountName
-  scope: resourceGroup(blobStorageResourceGroup)
-}
-
-// Storage Blob Data Reader ロール定義 ID（組み込みロール）
-var storageBlobDataReaderRoleId = '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
-
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(blobStorage.id, staticWebApp.outputs.managedIdentityPrincipalId, storageBlobDataReaderRoleId)
-  scope: blobStorage
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataReaderRoleId)
-    principalId: staticWebApp.outputs.managedIdentityPrincipalId
-    principalType: 'ServicePrincipal'
-    description: 'Static Web Apps Managed Identity -> Storage Blob Data Reader'
-  }
-}
-
-// -------------------------------------------------------
 // Outputs
 // -------------------------------------------------------
 output staticWebAppId string = staticWebApp.outputs.staticWebAppId
 output defaultHostname string = staticWebApp.outputs.defaultHostname
-output managedIdentityPrincipalId string = staticWebApp.outputs.managedIdentityPrincipalId
 output deploymentToken string = staticWebApp.outputs.deploymentToken
