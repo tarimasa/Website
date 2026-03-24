@@ -18,6 +18,7 @@ export interface PostMeta {
   description: string;
   tags: string[];
   readingTime?: number;
+  draft?: boolean;
 }
 
 export interface Post extends PostMeta {
@@ -52,8 +53,10 @@ export function getSortedPostsData(): PostMeta[] {
         description: data.description ?? "",
         tags: data.tags ?? [],
         readingTime: calculateReadingTime(content),
+        draft: data.draft ?? false,
       } as PostMeta;
-    });
+    })
+    .filter((post) => !post.draft);  // draft: true の記事を除外
 
   return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
