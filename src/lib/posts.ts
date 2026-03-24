@@ -14,6 +14,7 @@ export interface PostMeta {
   slug: string;
   title: string;
   date: string;
+  draft: string;
   description: string;
   tags: string[];
   readingTime?: number;
@@ -35,6 +36,7 @@ export function getSortedPostsData(): PostMeta[] {
   const fileNames = fs.readdirSync(postsDirectory);
   const allPostsData = fileNames
     .filter((fileName) => fileName.endsWith(".mdx") || fileName.endsWith(".md"))
+    .filter((post) => !post.draft) 
     .map((fileName) => {
       const slug = fileName.replace(/\.(mdx|md)$/, "");
       const fullPath = fs.existsSync(path.join(postsDirectory, `${slug}.mdx`))
