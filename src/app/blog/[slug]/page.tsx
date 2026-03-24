@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
-import rehypeSlug from "rehype-slug";
 import { getPostData, getSortedPostsData } from "@/lib/posts";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -18,7 +14,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostData(params.slug);
+  const { slug } = await params;
+  const post = await getPostData(slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -33,7 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPost({ params }: Props) {
-  const post = await getPostData(params.slug);
+  const { slug } = await params;
+  const post = await getPostData(slug);
   if (!post) notFound();
 
   return (
@@ -66,30 +64,20 @@ export default async function BlogPost({ params }: Props) {
         )}
       </header>
 
-      {/* 本文 */}
-      <div className="prose prose-slate max-w-none
-        prose-headings:font-bold prose-headings:text-slate-900
-        prose-a:text-blue-600 hover:prose-a:text-blue-800
-        prose-code:text-blue-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-        prose-pre:bg-slate-900
-        prose-blockquote:border-blue-400 prose-blockquote:text-slate-600">
-        <MDXRemote
-          source={post.content}
-          options={{
-            mdxOptions: {
-              remarkPlugins: [remarkGfm],
-              rehypePlugins: [rehypeHighlight, rehypeSlug],
-            },
-          }}
-        />
-      </div>
+      {/* 本文（remark/rehype で変換済みの HTML を出力） */}
+      <div
+        className="prose prose-slate max-w-none
+          prose-headings:font-bold prose-headings:text-slate-900
+          prose-a:text-blue-600 hover:prose-a:text-blue-800
+          prose-code:text-blue-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+          prose-pre:bg-slate-900
+          prose-blockquote:border-blue-400 prose-blockquote:text-slate-600"
+        dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+      />
 
       {/* フッター */}
       <footer className="mt-12 pt-8 border-t border-slate-200">
-        <a
-          href="/blog"
-          className="text-blue-600 hover:text-blue-800 font-medium"
-        >
+        <a href="/blog" className="text-blue-600 hover:text-blue-800 font-medium">
           ← 記事一覧に戻る
         </a>
       </footer>
