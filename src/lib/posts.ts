@@ -14,7 +14,7 @@ export interface PostMeta {
   slug: string;
   title: string;
   date: string;
-  draft: string;
+  draft: boolean;
   description: string;
   tags: string[];
   readingTime?: number;
