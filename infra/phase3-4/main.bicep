@@ -34,4 +34,3 @@ module staticWebApp 'static-web-app.bicep' = {
 // -------------------------------------------------------
 output staticWebAppId string = staticWebApp.outputs.staticWebAppId
 output defaultHostname string = staticWebApp.outputs.defaultHostname
-output deploymentToken string = staticWebApp.outputs.deploymentToken

@@ -4,7 +4,7 @@
 # =============================================================================
 set -euo pipefail
 
-RESOURCE_GROUP="rg-portfolio"
+RESOURCE_GROUP="Website"
 LOCATION="eastasia"
 APP_NAME="portfolio-website"
 REPOSITORY_URL="https://github.com/tarimasa/Website"
@@ -44,9 +44,14 @@ DEPLOY_OUTPUT=$(az deployment group create \
   --output json)
 
 DEFAULT_HOSTNAME=$(echo "${DEPLOY_OUTPUT}" | jq -r '.defaultHostname.value')
-DEPLOYMENT_TOKEN=$(echo "${DEPLOY_OUTPUT}" | jq -r '.deploymentToken.value')
 
 echo "  Static Web Apps ホスト名: ${DEFAULT_HOSTNAME}"
+
+# デプロイトークンを az コマンドで取得
+DEPLOYMENT_TOKEN=$(az staticwebapp secrets list \
+  --name "${APP_NAME}" \
+  --resource-group "${RESOURCE_GROUP}" \
+  --query "properties.apiKey" -o tsv)
 
 # GitHub Actions シークレットにデプロイトークンを設定
 if command -v gh &>/dev/null; then
