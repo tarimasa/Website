@@ -211,7 +211,7 @@ Website/
 | Azure Blob Storage（5GB・個人ブログ規模） | 1〜数円 |
 | Cloudflare DNS/WAF | 0円 |
 | GitHub（Free） | 0円 |
-| ドメイン（Cloudflare Registrar） | 約150円/月（年1,800円） |
+| ドメイン（お名前.com） | 約150円/月（年1,800円） |
 | **合計** | **約150〜200円/月** |
 
 ---
