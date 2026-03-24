@@ -10,6 +10,8 @@ interface Props {
 
 export async function generateStaticParams() {
   const posts = getSortedPostsData();
+  // 公開記事が0件のときもビルドが止まらないようダミーを返す
+  if (posts.length === 0) return [{ slug: "_empty" }];
   return posts.map((post) => ({ slug: post.slug }));
 }
 
