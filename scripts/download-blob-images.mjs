@@ -123,16 +123,54 @@ console.log(
 );
 
 // -------------------------------------------------------
-// アイコン画像を images コンテナから取得 → public/icon.jpg
+// アイコン画像を取得 → public/icon.jpg
+// 試行順: メインコンテナ → "images" コンテナ の順で
+// ファイル名: icon.jpg / icon.jpeg / icon.png / icon（拡張子なし）を試行
 // -------------------------------------------------------
-console.log("[download-blob-images] images コンテナから icon.jpg を取得中...");
-const iconContainerClient = blobServiceClient.getContainerClient("images");
-const iconBlobClient = iconContainerClient.getBlockBlobClient("icon.jpg");
-const iconDownload = await iconBlobClient.download();
-if (iconDownload.readableStreamBody) {
-  mkdirSync(PUBLIC_DIR, { recursive: true });
-  await pipeline(iconDownload.readableStreamBody, createWriteStream(join(PUBLIC_DIR, "icon.jpg")));
-  console.log("[download-blob-images] icon.jpg → public/icon.jpg ダウンロード完了");
-} else {
-  console.warn("[download-blob-images] icon.jpg のストリームが取得できません");
+console.log("[download-blob-images] アイコン画像を検索中...");
+
+// 診断: ストレージアカウントのコンテナ一覧を表示
+try {
+  const containerList = [];
+  for await (const c of blobServiceClient.listContainers()) {
+    containerList.push(c.name);
+  }
+  console.log(`[download-blob-images] 利用可能なコンテナ: ${containerList.join(", ")}`);
+} catch (e) {
+  console.warn(`[download-blob-images] コンテナ一覧の取得に失敗: ${e.message}`);
+}
+
+const iconCandidates = ["icon.jpg", "icon.jpeg", "icon.png", "icon"];
+const iconContainerNames = [AZURE_STORAGE_CONTAINER_NAME, "images", "image"];
+
+let iconFound = false;
+
+outer: for (const containerName of iconContainerNames) {
+  const iconContainer = blobServiceClient.getContainerClient(containerName);
+  for (const blobName of iconCandidates) {
+    try {
+      const blobClient = iconContainer.getBlockBlobClient(blobName);
+      const exists = await blobClient.exists();
+      if (!exists) continue;
+
+      console.log(`[download-blob-images] コンテナ "${containerName}" で "${blobName}" を発見`);
+      const download = await blobClient.download();
+      if (!download.readableStreamBody) continue;
+
+      mkdirSync(PUBLIC_DIR, { recursive: true });
+      await pipeline(
+        download.readableStreamBody,
+        createWriteStream(join(PUBLIC_DIR, "icon.jpg"))
+      );
+      console.log(`[download-blob-images] ${containerName}/${blobName} → public/icon.jpg ダウンロード完了`);
+      iconFound = true;
+      break outer;
+    } catch (e) {
+      console.warn(`[download-blob-images] ${containerName}/${blobName} の取得に失敗: ${e.message}`);
+    }
+  }
+}
+
+if (!iconFound) {
+  console.warn("[download-blob-images] アイコン画像が見つかりませんでした。public/icon.jpg をスキップします");
 }
