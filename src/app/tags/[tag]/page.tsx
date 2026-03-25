@@ -10,12 +10,11 @@ interface Props {
 
 export function generateStaticParams() {
   const tags = getAllTags();
-  return tags.map((tag) => ({ tag: encodeURIComponent(tag) }));
+  return tags.map((tag) => ({ tag }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { tag: rawTag } = await params;
-  const tag = decodeURIComponent(rawTag);
+  const { tag } = await params;
   return {
     title: `${tag} の記事一覧`,
     description: `${tag} タグの記事一覧`,
@@ -23,8 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TagPage({ params }: Props) {
-  const { tag: rawTag } = await params;
-  const tag = decodeURIComponent(rawTag);
+  const { tag } = await params;
   const allPosts = getSortedPostsData();
   const posts = allPosts.filter((post) => post.tags.includes(tag));
 

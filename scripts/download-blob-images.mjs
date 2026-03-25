@@ -26,6 +26,7 @@ import { pipeline } from "stream/promises";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "../public/blog-images");
+const PUBLIC_DIR = join(__dirname, "../public");
 
 // -------------------------------------------------------
 // 環境変数の確認
@@ -120,3 +121,18 @@ for await (const blob of containerClient.listBlobsFlat()) {
 console.log(
   `[download-blob-images] 完了: ${downloadCount} 件ダウンロード, ${skipCount} 件スキップ`
 );
+
+// -------------------------------------------------------
+// アイコン画像を images コンテナから取得 → public/icon.jpg
+// -------------------------------------------------------
+console.log("[download-blob-images] images コンテナから icon.jpg を取得中...");
+const iconContainerClient = blobServiceClient.getContainerClient("images");
+const iconBlobClient = iconContainerClient.getBlockBlobClient("icon.jpg");
+const iconDownload = await iconBlobClient.download();
+if (iconDownload.readableStreamBody) {
+  mkdirSync(PUBLIC_DIR, { recursive: true });
+  await pipeline(iconDownload.readableStreamBody, createWriteStream(join(PUBLIC_DIR, "icon.jpg")));
+  console.log("[download-blob-images] icon.jpg → public/icon.jpg ダウンロード完了");
+} else {
+  console.warn("[download-blob-images] icon.jpg のストリームが取得できません");
+}

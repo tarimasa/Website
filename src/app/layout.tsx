@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     template: "%s | Tarimasa tech",
   },
   description:
-    "NTT西日本セールスSEがEntraID・ゼロトラスト・M365・GIGAスクールの知見を発信する技術ブログ。Microsoft転職を目指すポートフォリオサイト。",
+    "NTT西日本セールスSEがEntraID・ゼロトラスト・M365・GIGAスクールの知見を発信する技術ブログ。",
   keywords: ["EntraID", "ゼロトラスト", "M365", "Azure", "GIGAスクール", "Microsoft"],
   authors: [{ name: "tarimasa" }],
   icons: {
-    icon: "https://picture0808.blob.core.windows.net/images/icon.jpg",
-    shortcut: "https://picture0808.blob.core.windows.net/images/icon.jpg",
-    apple: "https://picture0808.blob.core.windows.net/images/icon.jpg",
+    icon: "/icon.jpg",
+    shortcut: "/icon.jpg",
+    apple: "/icon.jpg",
   },
   openGraph: {
     type: "website",

@@ -24,7 +24,7 @@ export default function Sidebar() {
         <div className="text-center mb-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://picture0808.blob.core.windows.net/images/icon.jpg"
+            src="/icon.jpg"
             alt="tarimasa"
             className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
           />
@@ -32,8 +32,7 @@ export default function Sidebar() {
           <p className="text-sm text-slate-600 mt-1">NTT西日本 セールスSE</p>
         </div>
         <p className="text-sm text-slate-700 leading-relaxed">
-          教育委員会・自治体向けのゼロトラスト提案、GIGAスクール対応、M365展開を担当。Microsoft
-          転職に向けて技術ブログを発信中。
+          教育委員会・自治体向けのゼロトラスト提案、GIGAスクール対応、M365展開を担当。技術ブログを発信中。
         </p>
       </div>
 
@@ -47,7 +46,7 @@ export default function Sidebar() {
             {Object.entries(tagCounts).map(([tag, count]) => (
               <li key={tag}>
                 <Link
-                  href={`/tags/${encodeURIComponent(tag)}`}
+                  href={`/tags/${tag}`}
                   className="flex items-center justify-between text-sm text-slate-700 hover:text-blue-600 transition-colors py-1"
                 >
                   <span>{tag}</span>
