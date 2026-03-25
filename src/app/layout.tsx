@@ -9,18 +9,23 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: {
-    default: "tarimasa.dev | EntraID・ゼロトラスト・M365 技術ブログ",
-    template: "%s | tarimasa.dev",
+    default: "Tarimasa tech | EntraID・ゼロトラスト・M365 技術ブログ",
+    template: "%s | Tarimasa tech",
   },
   description:
     "NTT西日本セールスSEがEntraID・ゼロトラスト・M365・GIGAスクールの知見を発信する技術ブログ。Microsoft転職を目指すポートフォリオサイト。",
   keywords: ["EntraID", "ゼロトラスト", "M365", "Azure", "GIGAスクール", "Microsoft"],
   authors: [{ name: "tarimasa" }],
+  icons: {
+    icon: "https://picture0808.blob.core.windows.net/images/icon.jpg",
+    shortcut: "https://picture0808.blob.core.windows.net/images/icon.jpg",
+    apple: "https://picture0808.blob.core.windows.net/images/icon.jpg",
+  },
   openGraph: {
     type: "website",
     locale: "ja_JP",
     url: "https://tarimasa.dev",
-    siteName: "tarimasa.dev",
+    siteName: "Tarimasa tech",
   },
 };
 

@@ -59,6 +59,13 @@ export function getSortedPostsData(): PostMeta[] {
   return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+export function getAllTags(): string[] {
+  const posts = getSortedPostsData();
+  const tagSet = new Set<string>();
+  posts.forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
+  return Array.from(tagSet);
+}
+
 export async function getPostData(slug: string): Promise<Post | null> {
   const mdxPath = path.join(postsDirectory, `${slug}.mdx`);
   const mdPath = path.join(postsDirectory, `${slug}.md`);
