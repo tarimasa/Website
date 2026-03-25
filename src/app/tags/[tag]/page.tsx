@@ -10,9 +10,10 @@ interface Props {
 
 export function generateStaticParams() {
   const tags = getAllTags();
-  // URL エンコードしたパス名でファイルを生成する
-  // → Azure Static Web Apps がファイルパスを URL デコードせずに参照するため
-  return tags.map((tag) => ({ tag: encodeURIComponent(tag) }));
+  // 生の文字列で返す（日本語フォルダ名）
+  // Azure SWA はリクエスト URL を URL デコードしてからファイルを探すため
+  // エンコード済みフォルダ名だと 404 になる
+  return tags.map((tag) => ({ tag }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

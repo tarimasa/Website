@@ -46,7 +46,7 @@ export default function Sidebar() {
             {Object.entries(tagCounts).map(([tag, count]) => (
               <li key={tag}>
                 <Link
-                  href={`/tags/${encodeURIComponent(tag)}`}
+                  href={`/tags/${tag}`}
                   className="flex items-center justify-between text-sm text-slate-700 hover:text-blue-600 transition-colors py-1"
                 >
                   <span>{tag}</span>
