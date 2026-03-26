@@ -1,0 +1,103 @@
+---
+title: "情報システム担当者が知っておくべきIdPとSPの関係：SAML連携の全体像を図解する"
+date: "2026-05-23"
+description: "SAML連携で登場するIdPとSPの役割を図解で整理し、Entra IDをIdPとしてSaaS（Salesforce・Boxなど）にSSO連携する際のメタデータ交換の流れを解説する。"
+tags: ["SAML", "IdP", "SSO", "EntraID", "SaaS連携"]
+draft: true
+---
+
+## はじめに
+
+SaaS導入の際に「SAML連携をしたいのでメタデータをください」と言われたことはありませんか？IdP・SP・メタデータ・SAMLアサーション——初めて聞くとなんのことか分からない用語が並びますが、構造は非常にシンプルです。
+
+## IdPとSPとは
+
+| 用語 | 正式名称 | 役割 | 代表例 |
+|------|---------|------|--------|
+| IdP | Identity Provider（IDプロバイダー） | 「この人は誰か」を証明する | Entra ID、Okta、Google Workspace |
+| SP | Service Provider（サービスプロバイダー） | サービスを提供する側 | Salesforce、Box、Slack、Zoom |
+
+```
+シンプルにいうと:
+IdP = 「社員証を発行する会社（人事部）」
+SP  = 「社員証を確認して入室を許可するビル」
+```
+
+## SAML連携のフロー（SP-initiated）
+
+```
+① ユーザーがSalesforce（SP）にアクセス
+② SalesforceがEntra ID（IdP）にリダイレクト
+   「このユーザーの認証をお願いします」
+③ ユーザーがEntra IDでサインイン
+④ Entra IDがSAMLアサーション（XML）を生成
+   「山田太郎・taro@contoso.com・認証済みです」
+⑤ SAMLアサーションをブラウザ経由でSalesforceに送信
+⑥ SalesforceがSAMLアサーションを検証
+⑦ ユーザーがSalesforceにサインイン完了
+```
+
+## メタデータとは
+
+IdPとSPが互いに「相手が誰か・どこに送ればいいか」を知るための設定情報をXML形式でまとめたものです。
+
+### IdPメタデータ（Entra IDが提供）
+
+```xml
+<!-- 主な要素 -->
+<EntityDescriptor entityID="https://sts.windows.net/テナントID/">
+  <IDPSSODescriptor>
+    <!-- 署名証明書（SPがアサーションの署名を検証するために使う） -->
+    <KeyDescriptor use="signing">...</KeyDescriptor>
+    <!-- SAMLアサーションを受け取るエンドポイント（SP→IdPのリダイレクト先） -->
+    <SingleSignOnService Binding="...Redirect" Location="https://login.microsoftonline.com/..."/>
+  </IDPSSODescriptor>
+</EntityDescriptor>
+```
+
+### SPメタデータ（Salesforce等が提供）
+
+```xml
+<!-- 主な要素 -->
+<EntityDescriptor entityID="https://saml.salesforce.com">
+  <SPSSODescriptor>
+    <!-- SAMLアサーションの受け取り先URL（ACS URL） -->
+    <AssertionConsumerService Location="https://contoso.my.salesforce.com/..."/>
+  </SPSSODescriptor>
+</EntityDescriptor>
+```
+
+## Entra IDでSAML連携を設定する手順
+
+1. Entra IDポータル → エンタープライズアプリケーション → 新しいアプリケーション
+2. アプリギャラリーからSalesforce等を選択（またはギャラリー外）
+3. シングルサインオン → SAML を選択
+4. **基本的なSAML構成**を入力:
+   - 識別子（Entity ID）: SPのEntityID
+   - 返信URL（ACS URL）: SPのAssertionConsumerService URL
+5. Entra IDのメタデータURLをSP側に設定
+6. 属性マッピングを設定（メールアドレス・名前等）
+
+## よく使う属性マッピング
+
+| 属性 | Entra IDのソース |
+|------|----------------|
+| emailaddress | user.mail |
+| displayname | user.displayname |
+| givenname | user.givenname |
+| surname | user.surname |
+| userPrincipalName | user.userprincipalname |
+
+## よくあるハマりポイント
+
+- **Entity IDの大文字・小文字・末尾スラッシュが一致しない**（完全一致が必要）
+- **証明書の有効期限切れ**（Entra IDの証明書は3年。更新タイミングを管理）
+- **属性マッピングの値が空になる**（user.mailが設定されていないユーザーがいる）
+
+## まとめ
+
+SAML連携の本質は「IdPとSPがメタデータを交換して信頼関係を確立し、SAMLアサーションでユーザー情報を安全に渡す」という2ステップです。Entra IDはほぼすべての主要SaaSとのSAML連携テンプレートを持っているので、ギャラリーアプリを使えば設定は格段に簡単になります。
+
+---
+
+*この記事は公開情報をベースに構成しています。*

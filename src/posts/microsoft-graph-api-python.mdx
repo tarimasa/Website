@@ -1,0 +1,137 @@
+---
+title: "Microsoft Graph APIをPythonで使う：ユーザー・グループ管理を自動化する"
+date: "2026-04-27"
+description: "Microsoft Graph APIをPythonのSDKから呼び出し、ユーザー一覧取得・グループ操作・サインインログ収集を自動化するスクリプトを解説。アプリ認証のセットアップからAPI権限の付与まで一通り紹介。"
+tags: ["Graph API", "Python", "Microsoft365", "EntraID", "自動化"]
+draft: true
+---
+
+## はじめに
+
+M365やEntra IDの管理作業、ポータルでポチポチしていませんか？Microsoft Graph APIをPythonから呼び出せば、ユーザー管理・グループ操作・ログ収集など多くの作業を自動化できます。この記事では認証設定からよく使うAPI操作まで一通り解説します。
+
+## 事前準備：アプリ登録と権限設定
+
+### 1. Entra IDにアプリ登録
+
+Entra IDポータル → アプリの登録 → 新規登録
+
+### 2. API権限を追加
+
+```
+用途に応じて必要な権限を選ぶ（アプリケーション権限）:
+・User.Read.All          → ユーザー一覧の読み取り
+・Group.ReadWrite.All    → グループの読み書き
+・AuditLog.Read.All      → 監査・サインインログの読み取り
+・Directory.Read.All     → ディレクトリ情報の読み取り
+```
+
+**管理者の同意**を必ず付与すること。
+
+### 3. クライアントシークレットを発行
+
+設定 → 証明書とシークレット → 新しいクライアントシークレット
+
+## インストール
+
+```bash
+pip install msgraph-sdk azure-identity
+```
+
+## 認証（クライアントシークレット方式）
+
+```python
+from azure.identity import ClientSecretCredential
+from msgraph import GraphServiceClient
+
+credential = ClientSecretCredential(
+    tenant_id="your-tenant-id",
+    client_id="your-client-id",
+    client_secret="your-client-secret"
+)
+
+client = GraphServiceClient(credential)
+```
+
+## ユーザー一覧の取得
+
+```python
+import asyncio
+
+async def get_users():
+    users = await client.users.get()
+    for user in users.value:
+        print(f"{user.display_name}: {user.user_principal_name}")
+
+asyncio.run(get_users())
+```
+
+## グループメンバーの追加
+
+```python
+from msgraph.generated.models.reference_create import ReferenceCreate
+
+async def add_member_to_group(group_id: str, user_id: str):
+    ref = ReferenceCreate()
+    ref.odata_id = f"https://graph.microsoft.com/v1.0/users/{user_id}"
+
+    await client.groups.by_group_id(group_id).members.ref.post(ref)
+    print(f"ユーザー {user_id} をグループ {group_id} に追加しました")
+
+asyncio.run(add_member_to_group("group-id", "user-id"))
+```
+
+## サインインログの取得
+
+```python
+async def get_signin_logs():
+    logs = await client.audit_logs.sign_ins.get(
+        request_configuration=lambda config: config.query_parameters.__setattr__(
+            "filter", "createdDateTime ge 2026-04-01T00:00:00Z"
+        )
+    )
+    for log in logs.value:
+        print(f"{log.created_date_time}: {log.user_principal_name} - {log.ip_address}")
+
+asyncio.run(get_signin_logs())
+```
+
+## CSV出力サンプル
+
+```python
+import csv
+import asyncio
+
+async def export_users_to_csv():
+    users = await client.users.get()
+
+    with open("users.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["表示名", "UPN", "部署", "役職"])
+        for user in users.value:
+            writer.writerow([
+                user.display_name,
+                user.user_principal_name,
+                user.department or "",
+                user.job_title or ""
+            ])
+    print("users.csv に出力しました")
+
+asyncio.run(export_users_to_csv())
+```
+
+## よくあるエラーと対処
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| 403 Forbidden | API権限不足 or 管理者同意未付与 | 権限設定・同意を確認 |
+| 401 Unauthorized | 認証情報が誤り or 期限切れ | クライアントIDとシークレットを確認 |
+| 429 Too Many Requests | レートリミット | Retry-Afterヘッダーに従ってリトライ |
+
+## まとめ
+
+Microsoft Graph APIとPythonの組み合わせで、M365・Entra IDの管理業務を大幅に自動化できます。ユーザー一括登録・グループ管理・定期的なレポート出力など、日々の運用工数を削減しましょう。
+
+---
+
+*この記事は公開情報をベースに構成しています。*

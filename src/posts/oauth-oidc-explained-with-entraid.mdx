@@ -1,0 +1,92 @@
+---
+title: "OAuthとOpenID Connectをエンジニア目線で整理する：Entra IDを例に仕組みを理解する"
+date: "2026-04-11"
+description: "混同されがちなOAuth 2.0とOIDCの違いを「認可」と「認証」の観点から整理し、Entra IDを例に認可コードフロー・トークンの構造・スコープを図解で解説する。"
+tags: ["OAuth", "OIDC", "OpenIDConnect", "EntraID", "認証", "認可"]
+draft: true
+---
+
+## はじめに
+
+「OAuthとOpenID Connect（OIDC）の違いって何？」——認証実装に関わるエンジニアなら一度は詰まる問いです。「どちらも認証に使うやつ」という理解でなんとなくコードを書いていませんか？この記事で違いをすっきり整理しましょう。
+
+## 一言で整理する
+
+| プロトコル | 目的 | 答える問い |
+|------------|------|-----------|
+| OAuth 2.0 | **認可**（Authorization） | 「このアプリはこのリソースにアクセスしていいか？」 |
+| OpenID Connect | **認証**（Authentication） | 「このユーザーは誰か？」 |
+
+OIDCはOAuth 2.0の上に構築された拡張仕様です。OAuth 2.0だけでは「誰がログインしたか」は分かりません。
+
+## OAuthの仕組み：認可コードフロー
+
+```
+①  ユーザーがアプリにアクセス
+②  アプリ → Entra ID に認可リクエスト（response_type=code）
+③  Entra ID → ユーザーにログイン画面を表示
+④  ユーザーがログイン + 同意
+⑤  Entra ID → アプリに認可コードを返す
+⑥  アプリ → Entra ID にコードを送ってトークンを要求
+⑦  Entra ID → アクセストークン（+ リフレッシュトークン）を返す
+⑧  アプリ → アクセストークンでAPIを呼ぶ
+```
+
+## OIDCが加えるもの：IDトークン
+
+OIDCを使うと、⑦のトークン取得時に**IDトークン**も返ってきます。
+
+```
+アクセストークン → APIへのアクセスに使う（Bearerトークン）
+IDトークン      → ユーザーの身元を証明する（JWTフォーマット）
+```
+
+### IDトークンの中身（JWTをデコードすると）
+
+```json
+{
+  "iss": "https://login.microsoftonline.com/{tenant}/v2.0",
+  "sub": "Axxxxxxxxxxxxxxxxxxxxxxx",
+  "aud": "your-app-client-id",
+  "exp": 1234567890,
+  "name": "山田 太郎",
+  "preferred_username": "taro@contoso.com",
+  "oid": "オブジェクトID",
+  "tid": "テナントID"
+}
+```
+
+## スコープの考え方
+
+```
+openid        → IDトークンを返す（OIDC有効化）
+profile       → 名前・ユーザー名などのプロフィール情報
+email         → メールアドレス
+offline_access → リフレッシュトークンを返す
+User.Read     → Microsoft Graph APIでユーザー情報を読む
+```
+
+## Entra IDのエンドポイント
+
+```
+認可エンドポイント:
+https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize
+
+トークンエンドポイント:
+https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token
+```
+
+## PKCEについて（現代のベストプラクティス）
+
+SPAやモバイルアプリでは認可コードフロー + **PKCE（Proof Key for Code Exchange）**が必須です。クライアントシークレットを安全に保管できない環境でのセキュリティ強化策です。
+
+## まとめ
+
+- OAuth = 認可（アクセス権限の委譲）
+- OIDC = 認証（OAuthの上にユーザーID確認を追加）
+- 実用上はOIDCを使えば認証も認可も両方カバーできる
+- Entra IDはv2.0エンドポイントでOIDCをフルサポート
+
+---
+
+*この記事は公開情報をベースに構成しています。*
