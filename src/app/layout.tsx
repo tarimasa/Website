@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -46,20 +45,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        {/* Google AdSense: <head> 内に配置（AdSense 審査・広告表示の要件） */}
+        {ADSENSE_CLIENT_ID && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+          />
+        )}
+      </head>
       <body className={`${inter.variable} font-sans min-h-screen flex flex-col`}>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
-
-        {/* Google AdSense: NEXT_PUBLIC_ADSENSE_CLIENT_ID が設定されている場合のみ読み込む */}
-        {ADSENSE_CLIENT_ID && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
       </body>
     </html>
   );
