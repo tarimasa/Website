@@ -44,9 +44,19 @@ jobs:
 
       # prebuild の二重実行を SKIP_BLOB_DOWNLOAD で防止
       - name: Build Next.js
-        run: npm run build
+        run: |
+          # ads.txt を生成（NEXT_PUBLIC_ADSENSE_CLIENT_ID が設定されている場合のみ）
+          # public/ 以下に置くと Next.js ビルドで out/ へコピーされる
+          if [ -n "$NEXT_PUBLIC_ADSENSE_CLIENT_ID" ]; then
+            echo "google.com, $NEXT_PUBLIC_ADSENSE_CLIENT_ID, DIRECT, f08c47fec0942fa0" > public/ads.txt
+            echo "[build] ads.txt を生成しました"
+          fi
+          npm run build
         env:
           SKIP_BLOB_DOWNLOAD: "true"
+          # NEXT_PUBLIC_* はビルド時に静的 HTML へ焼き込まれる
+          # GitHub Secrets に NEXT_PUBLIC_ADSENSE_CLIENT_ID = ca-pub-XXXX を追加すること
+          NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
 
       # app_location を "out" に直接指定して skip_app_build でアップロード
       - name: Deploy to Azure Static Web Apps

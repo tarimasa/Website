@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "";
+
 export const metadata: Metadata = {
   title: {
     default: "Tarimasa tech | EntraID・ゼロトラスト・M365 技術ブログ",
@@ -24,15 +26,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    url: "https://tarimasa.dev",
+    url: "https://www.tarimasa.com",
     siteName: "Tarimasa tech",
   },
+  // AdSense サイト所有権確認用 meta タグ
+  // <meta name="google-adsense-account" content="ca-pub-XXXX"> として静的 HTML に焼き込まれる
+  ...(ADSENSE_CLIENT_ID && {
+    other: {
+      "google-adsense-account": ADSENSE_CLIENT_ID,
+    },
+  }),
 };
 
-// AdSense パブリッシャーID（AdSense 審査通過後に設定）
-// 設定方法: GitHub リポジトリの Settings > Secrets > NEXT_PUBLIC_ADSENSE_CLIENT_ID
-// 値の例: ca-pub-XXXXXXXXXXXXXXXX
-const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "";
 
 export default function RootLayout({
   children,
