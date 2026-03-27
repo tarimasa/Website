@@ -43,14 +43,13 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        {/* Google AdSense: <head> 内に配置（AdSense 審査・広告表示の要件） */}
-        {ADSENSE_CLIENT_ID && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          />
-        )}
+        {/* Google AdSense: <head> 内に直接配置 */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={`${inter.variable} font-sans min-h-screen flex flex-col`}>
         <Header />
