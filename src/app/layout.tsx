@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "";
+const ADSENSE_CLIENT_ID = "ca-pub-9747176730475734";
 
 export const metadata: Metadata = {
   title: {
@@ -29,12 +29,9 @@ export const metadata: Metadata = {
     siteName: "Tarimasa tech",
   },
   // AdSense サイト所有権確認用 meta タグ
-  // <meta name="google-adsense-account" content="ca-pub-XXXX"> として静的 HTML に焼き込まれる
-  ...(ADSENSE_CLIENT_ID && {
-    other: {
-      "google-adsense-account": ADSENSE_CLIENT_ID,
-    },
-  }),
+  other: {
+    "google-adsense-account": ADSENSE_CLIENT_ID,
+  },
 };
 
 
