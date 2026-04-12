@@ -1,0 +1,99 @@
+---
+title: "Microsoft 365のライセンス管理をTerraformで自動化する"
+date: "2026-04-07"
+description: "Microsoft Graph APIをTerraformから操作し、M365ユーザーへのライセンス割り当てやグループ管理をIaC化する方法を紹介。手動ポータル操作からの脱却と変更履歴のGit管理について解説。"
+tags: ["Terraform", "Microsoft365", "M365", "IaC", "Graph API"]
+draft: true
+---
+
+## はじめに
+
+M365のライセンス管理、毎回Entraポータルでポチポチしていませんか？入社・退職・部署異動のたびに手動対応していると、ミスや対応漏れが発生しがちです。Terraformを使えばライセンス割り当てをコードで管理でき、変更履歴もGitで追えるようになります。
+
+## 必要なもの
+
+- Terraform（v1.5以上推奨）
+- `azuread` Terraform Provider
+- Entra IDのアプリ登録（Service Principal）
+- 必要なAPI権限（`User.ReadWrite.All`、`Directory.ReadWrite.All`）
+
+## Provider設定
+
+```hcl
+terraform {
+  required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.50"
+    }
+  }
+}
+
+provider "azuread" {
+  tenant_id     = var.tenant_id
+  client_id     = var.client_id
+  client_secret = var.client_secret
+}
+```
+
+## ユーザーへのライセンス割り当て
+
+```hcl
+# ライセンス付与グループの作成
+resource "azuread_group" "m365_business_premium" {
+  display_name     = "lic-m365-business-premium"
+  security_enabled = true
+  description      = "Microsoft 365 Business Premium ライセンス割り当てグループ"
+}
+
+# グループにライセンスを割り当て（グループベースライセンス）
+resource "azuread_group_license" "m365_bp_license" {
+  group_id    = azuread_group.m365_business_premium.id
+  sku_id      = var.m365_business_premium_sku_id  # SKU IDはテナントごとに確認
+}
+
+# ユーザーをグループに追加
+resource "azuread_group_member" "user_license" {
+  for_each = toset(var.licensed_users)
+
+  group_id  = azuread_group.m365_business_premium.id
+  member_id = data.azuread_user.users[each.value].id
+}
+```
+
+## SKU IDの確認方法
+
+```bash
+# Graph APIでSKU一覧を確認
+az rest --method GET \
+  --url "https://graph.microsoft.com/v1.0/subscribedSkus" \
+  --query "value[].{name:skuPartNumber, id:skuId}"
+```
+
+## グループベースライセンスのメリット
+
+- ユーザー個別ではなくグループでライセンスを管理できる
+- グループへの追加・削除だけでライセンスが自動付与・解除される
+- Terraform管理により変更をPRレビューできる
+
+```
+【運用フロー】
+1. 入社 → vars.tfのlicensed_usersに追加 → PR作成
+2. レビュー・承認 → terraform apply → 自動ライセンス付与
+3. 退職 → varsから削除 → PR作成 → terraform apply → 自動解除
+```
+
+## よくあるハマりポイント
+
+- **SKU IDはテナントにより異なる** → 必ず自テナントのGraph APIから確認
+- **グループベースライセンスはP1ライセンス以上が必要**
+- **サービスプランの個別無効化**はTerraformで細かく設定する必要がある
+- `azuread` providerのバージョンアップで破壊的変更が入ることがある
+
+## まとめ
+
+M365ライセンス管理のTerraform化は、運用の属人化解消と変更履歴管理の両方が実現できる取り組みです。グループベースライセンスとの組み合わせで、入退社対応の自動化・省力化に大きく貢献します。
+
+---
+
+*この記事は公開情報をベースに構成しています。*

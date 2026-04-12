@@ -1,0 +1,96 @@
+---
+title: "Entra IDのログをLog Analyticsに集約してセキュリティ監視を仕組み化する"
+date: "2026-04-17"
+description: "Entra IDのサインインログ・監査ログをLog Analytics Workspaceへ転送し、KQLクエリで不審なアクセスを検知するダッシュボードを構築する方法を解説。Microsoft Sentinelとの連携の入口にもなる内容。"
+tags: ["EntraID", "Log Analytics", "KQL", "セキュリティ監視", "Azure"]
+draft: true
+---
+
+## はじめに
+
+「不正ログインに気づいたのは翌日だった」——セキュリティインシデントあるあるです。Entra IDにはサインインログや監査ログが記録されていますが、デフォルトでは30日しか保存されず、異常を能動的に検知する仕組みもありません。Log Analytics Workspaceに転送することで、長期保存・リアルタイム分析・アラートが実現できます。
+
+## ログの種類
+
+| ログ名 | 内容 |
+|--------|------|
+| サインインログ | 誰がいつどこからサインインしたか |
+| 監査ログ | ユーザー・グループ・ポリシーの変更操作 |
+| プロビジョニングログ | SaaSへの自動ユーザープロビジョニング状況 |
+
+## Log Analytics Workspaceへの転送設定
+
+Entra IDポータル → 診断設定 → Log Analytics Workspaceを指定
+
+```
+転送するログカテゴリ（推奨）:
+✓ SignInLogs（サインインログ）
+✓ AuditLogs（監査ログ）
+✓ NonInteractiveUserSignInLogs（非インタラクティブサインイン）
+✓ ServicePrincipalSignInLogs（SP・アプリのサインイン）
+```
+
+## KQLクエリ基本
+
+Log Analyticsでは**KQL（Kusto Query Language）**でログを分析します。
+
+### 失敗サインインを多い順に集計する
+
+```kql
+SignInLogs
+| where TimeGenerated > ago(24h)
+| where ResultType != "0"  // 0 = 成功
+| summarize FailCount = count() by UserPrincipalName, IPAddress, ResultDescription
+| order by FailCount desc
+| take 20
+```
+
+### 海外IPからのサインインを検出する
+
+```kql
+SignInLogs
+| where TimeGenerated > ago(7d)
+| where ResultType == "0"
+| where Location !startswith "JP"
+| project TimeGenerated, UserPrincipalName, Location, IPAddress, AppDisplayName
+| order by TimeGenerated desc
+```
+
+### 管理者ロール変更を監査ログで追う
+
+```kql
+AuditLogs
+| where TimeGenerated > ago(30d)
+| where OperationName contains "Add member to role"
+| project TimeGenerated, InitiatedBy, TargetResources, Result
+```
+
+## アラートルールの設定
+
+クエリをアラートルールとして登録すると、条件合致時にメール・TeamsやLogic Apps経由で通知できます。
+
+```
+推奨アラート例:
+・同一IPから10回以上のサインイン失敗（5分以内）
+・特権ロールへのメンバー追加
+・海外からの管理者サインイン
+・MFAをバイパスしたサインイン
+```
+
+## Microsoft Sentinelとの関係
+
+同じLog Analytics Workspaceを使ってMicrosoft Sentinelを有効化すると、より高度なSIEM機能が使えます。ただしコストが発生するため、まずはLog Analytics単体でのKQL監視から始めるのが現実的です。
+
+## コスト管理のポイント
+
+- Log Analyticsはデータ量に応じた課金
+- サインインログは1日数GB〜数十GBになることがある
+- 個人・小規模組織なら無料枠（5GB/日）に収まることが多い
+
+## まとめ
+
+Entra IDのログをLog Analyticsに転送するだけで、セキュリティ監視の基盤が整います。KQLを使えばコーディング不要で柔軟な分析が可能です。まずはサインインログの転送設定とシンプルなアラートルール1つから始めてみましょう。
+
+---
+
+*この記事は公開情報をベースに構成しています。*

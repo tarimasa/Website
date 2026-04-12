@@ -1,0 +1,75 @@
+---
+title: "Microsoft Entra ID入門：Azure ADからの名称変更で何が変わったのかを整理する"
+date: "2026-04-01"
+description: "Azure Active DirectoryがMicrosoft Entra IDに改名された背景と、製品ラインナップの変化を整理する。Entra IDの主要機能をざっくり把握したい人向けの概念整理記事。"
+tags: ["EntraID", "AzureAD", "Microsoft365", "ID管理"]
+draft: true
+---
+
+## はじめに
+
+2023年7月、MicrosoftはAzure Active Directory（Azure AD）をMicrosoft Entra IDに改名しました。「また名前変わったの？」と思った方も多いはずです。この記事では、改名の背景と実際に何が変わったのか・変わっていないのかを整理します。
+
+## なぜ改名されたのか
+
+MicrosoftはID・アクセス管理製品群を「Microsoft Entra」ブランドに統一しました。背景には以下があります。
+
+- Azure以外の環境でも使われるIDソリューションであることを明示したい
+- クラウド・オンプレ・マルチクラウドを横断するIDプラットフォームとして位置づける
+- Entra製品ファミリー（Verified ID、Permissions Managementなど）との整合性
+
+```
+【Entraファミリーの主な製品】
+Microsoft Entra ID（旧Azure AD）        → クラウドID管理の中核
+Microsoft Entra ID Governance           → ライフサイクル・レビュー管理
+Microsoft Entra External ID             → 外部ユーザー・B2B/B2C
+Microsoft Entra Permissions Management  → マルチクラウド権限管理
+Microsoft Entra Verified ID             → 分散型ID（検証可能な資格情報）
+```
+
+## 変わったこと・変わっていないこと
+
+| 項目 | 変更内容 |
+|------|---------|
+| 製品名 | Azure AD → Microsoft Entra ID |
+| ポータルURL | portal.azure.com（共存）+ entra.microsoft.com |
+| PowerShellモジュール | AzureADモジュール → Microsoft.Graph推奨 |
+| ライセンス名 | Azure AD P1/P2 → Entra ID P1/P2 |
+| 機能そのもの | **変わっていない** |
+| API（Graph API） | **変わっていない** |
+
+## Entra IDの主要機能
+
+### 認証・サインイン管理
+
+- パスワード認証・MFA・パスワードレス（FIDO2・Windows Hello）
+- シングルサインオン（SSO）：SaaSアプリへの統合
+- セルフサービスパスワードリセット（SSPR）
+
+### アクセス制御
+
+- 条件付きアクセスポリシー（場所・デバイス・リスクベース）
+- ロールベースアクセス制御（RBAC）
+- Privileged Identity Management（PIM）
+
+### ID管理・ガバナンス
+
+- ユーザー・グループ管理
+- アクセスレビュー
+- ライフサイクル管理（入社・異動・退職）
+
+## ライセンスの種類
+
+| プラン | 主な機能 |
+|--------|---------|
+| Free | 基本的なID管理・SSO（アプリ10個まで） |
+| P1 | 条件付きアクセス・セルフサービスPWリセット・ハイブリッド構成 |
+| P2 | P1 + PIM・Identity Protection・アクセスレビュー |
+
+## まとめ
+
+名前は変わりましたが、機能・API・設定内容はほぼそのままです。ただしポータルの統一（entra.microsoft.com）やPowerShellモジュールのGraph移行など、運用上の変化点は把握しておきましょう。Entraブランドの製品ファミリーを理解しておくと、今後の機能拡張の文脈も追いやすくなります。
+
+---
+
+*この記事は公開情報をベースに構成しています。*
