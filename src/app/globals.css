@@ -25,6 +25,15 @@ body {
     @apply prose-headings:font-bold prose-headings:text-slate-900;
     @apply prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline;
     @apply prose-code:text-blue-700 prose-code:bg-slate-100;
-    @apply prose-pre:bg-slate-900;
+    @apply prose-pre:bg-slate-50;
   }
+}
+
+/* pre ブロック内の code は inline code 用スタイルをリセット */
+.prose pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
 }

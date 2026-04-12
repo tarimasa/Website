@@ -72,7 +72,7 @@ export default async function BlogPost({ params }: Props) {
           prose-headings:font-bold prose-headings:text-slate-900
           prose-a:text-blue-600 hover:prose-a:text-blue-800
           prose-code:text-blue-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-          prose-pre:bg-slate-900
+          prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-200 prose-pre:text-slate-800
           prose-blockquote:border-blue-400 prose-blockquote:text-slate-600"
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
