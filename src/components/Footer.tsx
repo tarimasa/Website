@@ -15,12 +15,12 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="https://x.com/tarimasa"
+            href="https://www.linkedin.com/in/arimasa-tanimoto-039568395"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-slate-900 transition-colors"
           >
-            X (Twitter)
+            LinkedIn
           </a>
           <a
             href="/privacy"
