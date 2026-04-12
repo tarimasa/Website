@@ -32,7 +32,10 @@ export default function Sidebar() {
           <p className="text-sm text-slate-600 mt-1">NTT西日本 セールスSE</p>
         </div>
         <p className="text-sm text-slate-700 leading-relaxed">
-          教育委員会・自治体向けのゼロトラスト提案、GIGAスクール対応、M365展開を担当。技術ブログを発信中。
+          教育委員会・医療機関向けにゼロトラスト提案を担当。SC-100保有。
+        </p>
+        <p className="text-sm text-slate-500 leading-relaxed mt-2">
+          Sales Engineer at NTT West Japan. Specializing in Zero Trust and cloud security. Microsoft Certified: Cybersecurity Architect Expert (SC-100).
         </p>
       </div>
 
