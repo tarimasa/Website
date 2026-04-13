@@ -60,14 +60,12 @@ export default function PrivacyPage() {
         <p className="text-slate-700 leading-relaxed">
           プライバシーポリシーに関するご質問は
           <a
-            href="https://x.com/tarimasa"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="mailto:tarimasa.blog@gmail.com"
             className="text-blue-600 underline mx-1"
           >
-            X（Twitter）のDM
+            tarimasa.blog@gmail.com
           </a>
-          からお問い合わせください。
+          までメールにてお問い合わせください。
         </p>
       </section>
     </div>
