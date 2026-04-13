@@ -29,13 +29,13 @@ export default function Sidebar() {
             className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
           />
           <h3 className="font-bold text-slate-900">tarimasa</h3>
-          <p className="text-sm text-slate-600 mt-1">NTT西日本 セールスSE</p>
+          <p className="text-sm text-slate-600 mt-1">大手SIer セールスSE</p>
         </div>
         <p className="text-sm text-slate-700 leading-relaxed">
           教育委員会・医療機関向けにゼロトラスト提案を担当。SC-100保有。
         </p>
         <p className="text-sm text-slate-500 leading-relaxed mt-2">
-          Sales Engineer at NTT West Japan. Specializing in Zero Trust and cloud security. Microsoft Certified: Cybersecurity Architect Expert (SC-100).
+          Sales Engineer at a major SIer. Specializing in Zero Trust and cloud security. Microsoft Certified: Cybersecurity Architect Expert (SC-100).
         </p>
       </div>
 

@@ -15,14 +15,6 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="https://www.linkedin.com/in/arimasa-tanimoto-039568395"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-slate-900 transition-colors"
-          >
-            LinkedIn
-          </a>
-          <a
             href="/privacy"
             className="hover:text-slate-900 transition-colors"
           >

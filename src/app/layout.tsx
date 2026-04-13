@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | Tarimasa tech",
   },
   description:
-    "NTT西日本セールスSEがEntraID・ゼロトラスト・M365・GIGAスクールの知見を発信する技術ブログ。",
+    "大手SIerセールスSEがEntraID・ゼロトラスト・M365の知見を発信する技術ブログ。",
   keywords: ["EntraID", "ゼロトラスト", "M365", "Azure", "GIGAスクール", "Microsoft"],
   authors: [{ name: "tarimasa" }],
   icons: {
