@@ -175,14 +175,12 @@ draft: true
 ---
 title: "Entra IDでSalesforceへSSO&ユーザー自動プロビジョニング！実践手順まとめ"
 date: "2026-04-03"
-description: "NTT west Engineers' Blogに私が投稿したものになります。記事ではMicrosoft Entra IDでSalesforceへのシングルサインオン(SSO)とユーザー自動プロビジョニングの実践的な手順をまとめています。
-本記事では、手順を解説するだけでなく、実際にあったエラーとその回避方法もご紹介します。"
+description: "Microsoft Entra IDでSalesforceへのシングルサインオン(SSO)とユーザー自動プロビジョニングの実践的な手順をまとめています。本記事では、手順を解説するだけでなく、実際にあったエラーとその回避方法もご紹介します。"
 tags: ["EntraID", "ID", "ゼロトラスト", "セキュリティ"]
 draft: true
 ---
 ## この記事記載する自分の体験談、ユニークポイント、入れたい項目
-NTT west Engineers' Blogに私が投稿したものになります。是非皆さん見に行ってください。
-https://engineers.ntt-west.co.jp/entry/2025/12/12/090000
+Entra IDを使ったSalesforceへのSSO・自動プロビジョニング手順をまとめた記事です。
 
 # ブログ10
 ---

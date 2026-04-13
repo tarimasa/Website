@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-NTT西日本のセールスSE（ゼロトラスト・M365・EntraID専門）が、Microsoft転職を目指すためのポートフォリオ兼技術ブログサイトを構築する。
+大手SIerのセールスSE（ゼロトラスト・M365・EntraID専門）が、Microsoft転職を目指すためのポートフォリオ兼技術ブログサイトを構築する。
 
 ### 目的
 - Microsoft営業職への転職ポートフォリオとして活用
@@ -117,9 +117,9 @@ GitHub Actions（push トリガー）
 
 ## ブログ想定テーマ
 
-- 教育委員会へのゼロトラスト提案経験
-- GIGAスクール環境でのEntraID構成
-- M365ライセンス整理・教育委員会向け説明方法
+- ゼロトラスト提案経験
+- EntraID構成ノウハウ
+- M365ライセンス整理・説明方法
 - EntraID × 各種SaaSのCSV連携ノウハウ
 - 自然言語でM365テナントを自動構築するツール（Graph API活用）
 
@@ -219,7 +219,7 @@ Website/
 ## 将来的な拡張候補
 
 - Azure Functions + Microsoft Graph APIを使ったM365自動構築ツールをサブプロジェクトとして追加
-- EntraIDからSaaS向けCSV変換ツール（教育委員会・GIGAスクール特化）
+- EntraIDからSaaS向けCSV変換ツール
 - 上記2つをポートフォリオとしてGitHubに公開しMicrosoft転職活動に活用
 
 ---
