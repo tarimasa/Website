@@ -32,7 +32,7 @@ export default function Sidebar() {
           <p className="text-sm text-slate-600 mt-1">大手SIer セールスSE</p>
         </div>
         <p className="text-sm text-slate-700 leading-relaxed">
-          教育委員会・医療機関向けにゼロトラスト提案を担当。SC-100保有。
+          NW・サーバーの運用保守、ゼロトラストの提案を担当。SC-100保有。
         </p>
         <p className="text-sm text-slate-500 leading-relaxed mt-2">
           Sales Engineer at a major SIer. Specializing in Zero Trust and cloud security. Microsoft Certified: Cybersecurity Architect Expert (SC-100).
